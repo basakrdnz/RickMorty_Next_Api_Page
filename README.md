@@ -5,7 +5,7 @@ I didn't use a specific Figma example on this website, but I wanted to do a colo
 
 -Also I am learning Next.js so it was a valuable exercise for me to create this site for understanding the data and file structures.
 
--I am sharing the github pages link for this website in here too so you can look up.
+-I share the vercel pages link for you to look; https://rick-morty-next-api-page.vercel.app/
 
 -In addition to what I have done, I am exploring the motion animations for making a better looking and unique websites so even the site is not completed, in the "karakterler" part, you can see my card motions. 
 
