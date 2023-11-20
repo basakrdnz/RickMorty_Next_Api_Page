@@ -2,7 +2,6 @@ import React from "react";
 import Button from "./Button";
 import Image from "next/image";
 import { COUNTRY_URL, PEOPLE_URL } from "@/constants";
-import { url } from "inspector";
 
 interface JoinedPeople {
   title: string;
@@ -89,9 +88,9 @@ const Hero = () => {
               height={180}
             ></Image>
           </div>
-          <div className="overflow-hidden rounded-full absolute -top-20 ">
+          <div className="overflow-hidden rounded-full absolute top-20 ">
             <Image
-              src="/indir__1_-removebg-preview.png"
+              src="/Rick_And_Morty_Sticker-removebg-preview.png"
               alt={""}
               width={800}
               height={1500}
