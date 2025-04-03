@@ -1,6 +1,5 @@
 "use client";
 import { motion, Variants } from "framer-motion";
-
 import Button from "@/components/Button";
 import { FILTERS_FOR_LESSONS } from "@/constants";
 import Image from "next/image";
@@ -14,158 +13,156 @@ interface PocoCards {
   gender: string;
   api: string;
 }
+
 const cardVariants: Variants = {
   offscreen: {
-    y: 200,
+    rotate: -15,
+    scale: 0.9,
+    opacity: 0.5,
   },
   onscreen: {
-    y: -100,
-    rotate: -360,
+    rotate: 0,
+    scale: 1,
+    opacity: 1,
     transition: {
       type: "spring",
       bounce: 0.4,
-      duration: 0.8,
+      duration: 0.9,
     },
   },
 };
 
-const Cards = ({ image, name, id, species, gender, api }: PocoCards) => {
+const Cards = ({ image, name, id, species, gender }: PocoCards) => {
   return (
-    <div className="flex mt-24 flex-col w-1/2 m-auto font-bold  bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 border-8 border-yellow-200 rounded-lg gap-5 justify-between p-4 cursor-pointer">
-      <div className="flex justify-between py-8 rounded-lg ">
-        <div className="flex w-1 h-20 bg-blue-400 "></div>
-        <div>{name} </div>
-        <div className="flex w-1 h-10 bg-blue-400 "></div>
-        <div>Species: {species} </div>
-        <div className="flex w-1 h-20 bg-blue-400 "></div>
-      </div>
-
+    <div
+      className="flex flex-col w-full min-h-[500px] bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 border-[6px] border-yellow-200 \
+      rounded-xl p-6 font-semibold text-white shadow-xl transition-all duration-300 hover:brightness-110 hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
+      id={name[0].toUpperCase()}
+    >
+      <div className="text-xl mb-2 text-center">{name}</div>
+      <div className="text-center mb-4">Species: {species}</div>
       <div className="mx-auto">
-        <Image src={image} alt={""} width={300} height={200}></Image>
+        <Image
+          src={image}
+          alt={`${name}'s image`}
+          width={300}
+          height={200}
+          className="rounded-lg object-cover"
+        />
       </div>
-      <div className="flex justify-between">
-        <h2>Gender</h2>
-        <div>{gender} </div>
+      <div className="flex justify-between mt-4">
+        <span>Gender:</span>
+        <span>{gender}</span>
       </div>
-
-      <div className="h-[0px] w-96 border-4 border-blue-400 mx-auto"></div>
-      <div className="flex justify-between">
-        <div>ID: {id}</div>
-        <Button title={"Select"} variant={"white"}></Button>
+      <div className="border-b-2 border-blue-400 my-4" />
+      <div className="flex justify-between items-center">
+        <span>ID: {id}</span>
+        <Button title="Select" variant="white" />
       </div>
     </div>
   );
 };
 
 const Tutors = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleLetterClick = (letter: string) => {
+    const match = data.find((character) => character.name[0].toUpperCase() === letter);
+    if (match) {
+      setMessage("");
+      const element = document.getElementById(letter);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else {
+      setMessage(`No characters found starting with '${letter}'`);
+    }
+  };
+
+  const alphabet = Array.from({ length: 26 }, (_, i) =>
+    String.fromCharCode(65 + i)
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch("/rick/api/character");
-        const data = await response.json();
-        //sadece ilk 3 karakteri almak için
-        const firstThreeCharacters = data.results.slice(0, 10);
-        console.log(firstThreeCharacters);
-        setData(firstThreeCharacters);
+        const jsonData = await response.json();
+        const limited = jsonData.results.slice(0, 10);
+        setData(limited);
       } catch (error) {
-        // Handle errors here
         console.error("Error fetching data:", error);
       }
     };
-
-    fetchData(); // Call the async function immediately
+    fetchData();
   }, []);
 
-  return (
-    <section
-      id="karakterler"
-      className="container flex flex-col m-auto px-20 my-10"
-    >
-      <div>
-        <div id="upper_search_bar" className="flex justify-between mx-3">
-          <div className="flex w-3/5 h-16 rounded-md shadow-2xl bg-gradient-to-r from-red-500 via-yellow-500 to-green-500">
-            <Image
-              src="/search_icon.png"
-              alt={"search_icon"}
-              width={10}
-              height={20}
-              className="p-5 h-auto w-auto"
-            ></Image>
+  const filteredData = data.filter((character) =>
+    character.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-            <input
-              type="text"
-              placeholder="Karakter İsmi"
-              className="h-10 w-64 my-auto p-5 rounded-full"
-            />
-            <div className="flex h-6 w-0 border-2 my-auto ml-10"></div>
-            <input
-              type="text"
-              placeholder="Bölüm İsmi"
-              className="h-10 w-64 m-auto p-5 rounded-full"
-            />
-            <div className="my-auto mr-4">
-              <Button
-                title={"Search"}
-                variant={"white"}
-                icon="/search_icon.png"
-              ></Button>
-            </div>
-          </div>
-          <div className="flex relative bg-red-300 p-2 px-6 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500">
-            <select
-              name="popular_lessons"
-              id="popular_lessons"
-              className=" w-96 h-12 text-black border-2 rounded-full my-auto "
-            >
-              <option value="Popular Lesson"></option>
-              <option value="A"></option>
-              <option value="B"></option>
-              <option value="C"></option>
-            </select>
-            <Image
-              src="/show_icon.png"
-              alt={"show"}
-              width={70}
-              height={50}
-              className="flex absolute p-6 top-1"
-            ></Image>
-          </div>
-        </div>
-        <div
-          id="bottom_search_bar"
-          className="flex flex-wrap justify-between gap-4 items-center container text-white my-5"
-        >
-          {FILTERS_FOR_LESSONS.map((lesson) => (
-            <div className=" p-4 px-5  border-2 rounded-lg shadow-lg text-lg cursor-pointer bg-gradient-to-b from-blue-500 via-green-500 to-green-500">
-              {lesson.label}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex flex-col flex-wrap gap-6 justify-between">
-        {data.map((rickandmortyapi: any) => (
-          <motion.div
-            className="card-container"
-            initial="offscreen"
-            whileInView="onscreen"
-            viewport={{ once: true, amount: 0.8 }}
+  return (
+    <section id="karakterler" className="container mx-auto px-4 md:px-20 my-10">
+      {/* A-Z Buttons */}
+      <div className="flex flex-wrap justify-center gap-2 mb-4">
+        {alphabet.map((letter) => (
+          <button
+            key={letter}
+            onClick={() => handleLetterClick(letter)}
+            className="w-10 h-10 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-700 transition"
           >
-            <div className="splash" />
-            <motion.div className="card" variants={cardVariants}>
-              <Cards
-                image={rickandmortyapi.image}
-                name={rickandmortyapi.name}
-                id={rickandmortyapi.id}
-                species={rickandmortyapi.species}
-                gender={rickandmortyapi.gender}
-                api={rickandmortyapi.url}
-              ></Cards>
-            </motion.div>
-          </motion.div>
+            {letter}
+          </button>
         ))}
       </div>
+
+      {message && (
+        <div className="text-center text-red-500 font-medium mb-6">
+          {message}
+        </div>
+      )}
+
+      {/* Search Input */}
+      <div className="flex justify-center mb-8">
+        <input
+          type="text"
+          placeholder="Karakter İsmi Ara..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-[300px] h-12 px-4 rounded-full border-2 border-gray-300 focus:outline-none focus:border-blue-400 shadow-md"
+        />
+      </div>
+
+      {/* Cards */}
+      {filteredData.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-12">
+          {filteredData.map((character) => (
+            <motion.div
+              key={character.id}
+              initial="offscreen"
+              whileInView="onscreen"
+              viewport={{ once: true }}
+              variants={cardVariants}
+              className="relative"
+            >
+              <Cards
+                image={character.image}
+                name={character.name}
+                id={character.id}
+                species={character.species}
+                gender={character.gender}
+                api={character.url}
+              />
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-gray-400 text-lg font-semibold mt-10">
+          😢 No characters found...
+        </div>
+      )}
     </section>
   );
 };
